@@ -18,7 +18,15 @@ export const useActiveLink = () => {
         [pathname],
     );
 
+    const isActiveSameRoute = useCallback(
+        (route: string) => {
+            return route === pathname;
+        },
+        [pathname],
+    );
+
     return {
         isActive: isActive,
+        isActiveSameRoute: isActiveSameRoute,
     };
 };

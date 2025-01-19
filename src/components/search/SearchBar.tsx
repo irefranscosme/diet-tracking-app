@@ -1,7 +1,11 @@
 import { Input } from '@/components/ui/input';
 import { SearchIcon } from 'lucide-react';
 
-export function SearchBar() {
+interface SearchBarProps {
+    placeholder: string;
+}
+
+export function SearchBar({ placeholder }: SearchBarProps) {
     return (
         <div className="flex w-full max-w-sm items-center space-x-2">
             <div className="relative isolate">
@@ -10,7 +14,7 @@ export function SearchBar() {
                 </div>
                 <Input
                     type="email"
-                    placeholder="Search products..."
+                    placeholder={placeholder}
                     className="pl-8"
                 />
             </div>

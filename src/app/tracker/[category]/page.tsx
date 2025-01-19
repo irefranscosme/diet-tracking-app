@@ -18,7 +18,7 @@ const Page = async ({ params }: { params: Promise<{ category: string }> }) => {
                 <h1 className="uppercase font-bold text-lg">
                     {CategoryDictionary[category]}
                 </h1>
-                <SearchBar />
+                <SearchBar placeholder="Search products..." />
             </div>
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-4">
