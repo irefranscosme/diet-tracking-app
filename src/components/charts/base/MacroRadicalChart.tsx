@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/card';
 import { ChartConfig, ChartContainer } from '@/components/ui/chart';
 import { ChartData } from '@/types/charts/ChartData';
-import MonthSelect from '../selection/MonthSelect';
+import MonthSelect from '../../selection/MonthSelect';
 
 const chartConfig = {
     total: {

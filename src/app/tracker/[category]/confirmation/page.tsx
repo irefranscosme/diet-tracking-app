@@ -1,6 +1,7 @@
+import TotalMacroTable from '@/components/confirmation/TotalMacroTable';
 import BackButton from '@/components/navigation/BackButton';
 import { routes } from '@/utils/routes';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 // TODO: import metadata
 export const metadata = {
@@ -8,7 +9,8 @@ export const metadata = {
     description: 'Tracker | Breakfast - Diet Tracking App Descripition',
 };
 
-const Page = async () => {
+// TODO: fetch the overall total of the user macros today.
+const Page = () => {
     return (
         <div className="space-y-8 max-w-4xl flex flex-col items-center justify-center h-full mx-auto">
             <p className="uppercase font-medium">
@@ -19,54 +21,9 @@ const Page = async () => {
                 You total macro for today:
             </h1>
             <div className="w-full">
-                <div className="flex w-full">
-                    <div className=" gap-2 basis-full flex items-center justify-center border">
-                        <p>Protein</p>
-                    </div>
-                    <div className="mt-0 basis-full flex items-center justify-center border border-l-0 rounded-none shadow-none">
-                        100
-                    </div>
-                </div>
-                <div className="flex w-full">
-                    <div className=" gap-2 basis-full border-t-0 flex items-center justify-center border">
-                        <p>Calories</p>
-                    </div>
-                    <div className="mt-0 basis-full flex items-center justify-center border border-l-0 border-t-0 rounded-none shadow-none">
-                        100
-                    </div>
-                </div>
-                <div className="flex w-full">
-                    <div className=" gap-2 basis-full border-t-0 flex items-center justify-center border">
-                        <p>Carbs</p>
-                    </div>
-                    <div className="mt-0 basis-full flex items-center justify-center border border-l-0 border-t-0 rounded-none shadow-none">
-                        100
-                    </div>
-                </div>
-                <div className="flex w-full">
-                    <div className=" gap-2 basis-full border-t-0 flex items-center justify-center border">
-                        <p>Sugar</p>
-                    </div>
-                    <div className="mt-0 basis-full flex items-center justify-center border border-l-0 border-t-0 rounded-none shadow-none">
-                        100
-                    </div>
-                </div>
-                <div className="flex w-full">
-                    <div className=" gap-2 basis-full border-t-0 flex items-center justify-center border">
-                        <p>Fat</p>
-                    </div>
-                    <div className="mt-0 basis-full flex items-center justify-center border border-l-0 border-t-0 rounded-none shadow-none">
-                        100
-                    </div>
-                </div>
-                <div className="flex w-full">
-                    <div className=" gap-2 basis-full border-t-0 flex items-center justify-center border">
-                        <p>Saturated Fat</p>
-                    </div>
-                    <div className="mt-0 basis-full flex items-center justify-center border border-l-0 border-t-0 rounded-none shadow-none">
-                        100
-                    </div>
-                </div>
+                <Suspense fallback={'Loading total of your macros today.'}>
+                    <TotalMacroTable />
+                </Suspense>
             </div>
             <BackButton route={routes.tracker} title={'Tracker'} />
         </div>

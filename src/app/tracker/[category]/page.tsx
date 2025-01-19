@@ -1,8 +1,8 @@
 import { CategoryForm } from '@/components/categories/CategoryForm';
-import { ProductSelectionContainer } from '@/components/products/ProductSelectionContainer';
+import Products from '@/components/products/Products';
 import { SearchBar } from '@/components/search/SearchBar';
 import { CategoryDictionary } from '@/utils/category';
-import React from 'react';
+import { Suspense } from 'react';
 
 // TODO: improve metadata
 export const metadata = {
@@ -13,14 +13,24 @@ export const metadata = {
 const Page = async ({ params }: { params: Promise<{ category: string }> }) => {
     const { category } = await params;
     return (
-        <div className="w-full px-4 h-full flex flex-col gap-2 justify-evenly p-5">
-            <h1 className="uppercase font-bold text-lg">
-                {CategoryDictionary[category]}
-            </h1>
+        <div className="w-full px-4 h-full space-y-4">
+            <div className="space-y-2">
+                <h1 className="uppercase font-bold text-lg">
+                    {CategoryDictionary[category]}
+                </h1>
+                <SearchBar />
+            </div>
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-4">
-                    <SearchBar />
-                    <ProductSelectionContainer category={category} />
+                    <Suspense
+                        fallback={
+                            <div className="flex h-full">
+                                Loading product selection...
+                            </div>
+                        }
+                    >
+                        <Products category={category} />
+                    </Suspense>
                 </div>
                 <CategoryForm category={category} />
             </div>

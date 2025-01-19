@@ -1,4 +1,3 @@
-import React from 'react';
 import CategoryHeader from './CategoryHeader';
 import CategoryContent from './CategoryContent';
 

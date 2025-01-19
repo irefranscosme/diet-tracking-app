@@ -18,7 +18,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
-import YearSelect from '../selection/YearSelect';
+import YearSelect from '../../selection/YearSelect';
 
 const chartData = [
     { browser: 'Calories', visitors: 275, fill: '#22c55e' },

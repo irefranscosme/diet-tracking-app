@@ -8,11 +8,11 @@ import {
     XAxis,
     YAxis,
 } from 'recharts';
-
 import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
@@ -22,7 +22,8 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
-import { DatePickerWithRange } from '../date/DatePickerWithRange';
+import { DatePickerWithRange } from '../../date/DatePickerWithRange';
+import { TrendingUp } from 'lucide-react';
 const chartData = [
     { month: 'Sugar', desktop: 186, mobile: 80, fill: '#ef4444' },
     { month: 'Fat', desktop: 305, mobile: 200, fill: '#eab308' },
@@ -102,7 +103,7 @@ export function MacroBarChartHorizontal() {
                     </BarChart>
                 </ChartContainer>
             </CardContent>
-            {/* <CardFooter className="flex-col items-start gap-2 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm">
                 <div className="flex gap-2 font-medium leading-none">
                     Trending up by 5.2% this month{' '}
                     <TrendingUp className="h-4 w-4" />
@@ -110,7 +111,7 @@ export function MacroBarChartHorizontal() {
                 <div className="leading-none text-muted-foreground">
                     Showing total visitors for the last 6 months
                 </div>
-            </CardFooter> */}
+            </CardFooter>
         </Card>
     );
 }

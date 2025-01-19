@@ -1,22 +1,16 @@
-import { MacroBarChartHorizontal } from '@/components/charts/MacroBarChartHorizontal';
-import { MacroPieChart } from '@/components/charts/MacroPieChart';
-import { MacroBarChartVertical } from '@/components/charts/MacroBarChartVertical';
-import { MacroRadicalChart } from '@/components/charts/MacroRadicalChart';
-import { ChartData } from '@/types/charts/ChartData';
+import { Suspense } from 'react';
+import { CaloriesChart } from '@/components/charts/CaloriesChart';
+import { ProteinChart } from '@/components/charts/ProteinChart';
+import { CarbsChart } from '@/components/charts/CarbsChart';
+import { LastMonthChart } from '@/components/charts/LastMonthChart';
+import { MacrosChart } from '@/components/charts/MacrosChart';
+import { ExtraMacrosChart } from '@/components/charts/ExtraMacrosChart';
 
-// TODO: import metadata
+// TODO: improve metadata
 export const metadata = {
     title: 'Dashboard - Diet Tracking App',
     description: 'Dashboard - Diet Tracking App Descripition',
 };
-
-const calories: ChartData[] = [
-    { macro: 'calories', total: 200, fill: '#22c55e' },
-];
-const protein: ChartData[] = [
-    { macro: 'protein', total: 180, fill: '#3b82f6' },
-];
-const carbs: ChartData[] = [{ macro: 'carbs', total: 243, fill: '#d946ef' }];
 
 export default function Page() {
     return (
@@ -39,27 +33,40 @@ export default function Page() {
                     </div>
                     <div className="grid grid-cols-3 gap-5">
                         <div className="grid grid-cols-3 gap-5 col-span-2">
-                            <MacroRadicalChart
-                                chartData={calories}
-                                title="Calories"
-                            />
-                            <MacroRadicalChart
-                                chartData={protein}
-                                title="Protein"
-                            />
-                            <MacroRadicalChart
-                                chartData={carbs}
-                                title="Carbs"
-                            />
+                            <Suspense
+                                fallback={<div>Loading calories chart...</div>}
+                            >
+                                <CaloriesChart />
+                            </Suspense>
+                            <Suspense
+                                fallback={<div>Loading Protein chart...</div>}
+                            >
+                                <ProteinChart />
+                            </Suspense>
+                            <Suspense
+                                fallback={<div>Loading Carbs chart...</div>}
+                            >
+                                <CarbsChart />
+                            </Suspense>
                         </div>
-                        <MacroBarChartHorizontal />
+                        <Suspense
+                            fallback={<div>Loading Extra macros chart...</div>}
+                        >
+                            <ExtraMacrosChart />
+                        </Suspense>
                     </div>
                 </div>
                 <div className="grid grid-cols-3 gap-5 row-span-3">
                     <div className="col-span-2">
-                        <MacroBarChartVertical />
+                        <Suspense
+                            fallback={<div>Loading last month chart...</div>}
+                        >
+                            <LastMonthChart />
+                        </Suspense>
                     </div>
-                    <MacroPieChart />
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <MacrosChart />
+                    </Suspense>
                 </div>
             </div>
         </main>
