@@ -23,12 +23,12 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
     return (
-        <Card className="w-full">
+        <Card className="w-full select-none hover:border hover:border-black ">
             <CardHeader>
                 <CardTitle>{product.name}</CardTitle>
                 <CardDescription>{product.type}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pointer-events-none">
                 <Table>
                     <TableCaption>Nutrients</TableCaption>
                     <TableHeader>

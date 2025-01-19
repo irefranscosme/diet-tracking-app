@@ -3,10 +3,8 @@ import React from 'react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { routes } from '@/utils/routes';
-// import { useActiveLink } from '@/hooks/useActiveLink';
 
 const CategoryContent = () => {
-    // const { isActive } = useActiveLink();
     return (
         <div className="grid gap-2 lg:grid-cols-4  md:grid-cols-2 sm:grid-cols-1">
             <Link

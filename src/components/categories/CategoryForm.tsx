@@ -115,14 +115,14 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                                     <FormLabel className="basis-full flex items-center justify-center border">
                                         Category
                                     </FormLabel>
-                                    <FormControl className="basis-full">
+                                    <FormControl className="basis-full border border-l-0">
                                         <Input
                                             placeholder="Your protein intake"
                                             {...field}
                                             value={CategoryDictionary[category]}
                                             disabled={true}
                                             required
-                                            className="mt-0 basis-full flex items-center justify-center border border-l-0 rounded-none shadow-none"
+                                            className="mt-0 basis-full flex items-center justify-center rounded-none shadow-none"
                                         />
                                     </FormControl>
                                 </FormItem>

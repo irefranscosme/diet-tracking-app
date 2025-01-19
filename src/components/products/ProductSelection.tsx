@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { ControllerRenderProps, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -16,6 +16,11 @@ import {
 } from '@/components/ui/form';
 import { Product } from '@/types/Product';
 import { ProductCard } from './ProductCard';
+import { CheckedState } from '@radix-ui/react-checkbox';
+import { useState } from 'react';
+import { Progress } from '../ui/progress';
+import { useRouter } from 'next/navigation';
+import { routes } from '@/utils/routes';
 
 const products: Product[] = [
     {
@@ -95,7 +100,25 @@ const ProductSchema = z.object({
         }),
 });
 
-export function ProductSelection() {
+interface ProductSelectionProps {
+    category: string;
+    onSelect: ({
+        productData,
+        isChecked,
+    }: {
+        productData: Product;
+        isChecked: boolean;
+    }) => void;
+}
+
+export function ProductSelection({
+    category,
+    onSelect,
+}: ProductSelectionProps) {
+    const [progress, setProgress] = useState(0);
+
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof ProductSchema>>({
         resolver: zodResolver(ProductSchema),
         defaultValues: {
@@ -103,109 +126,168 @@ export function ProductSelection() {
         },
     });
 
-    function onSubmit(data: z.infer<typeof ProductSchema>) {
+    const onSubmit = async (data: z.infer<typeof ProductSchema>) => {
+        form.clearErrors();
         console.log(data);
-        // toast({
-        //     title: 'You submitted the following values:',
-        //     description: (
-        //         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-        //             <code className="text-white">
-        //                 {JSON.stringify(data, null, 2)}
-        //             </code>
-        //         </pre>
-        //     ),
-        // });
-    }
+        let progress = 0;
+        const incrementStep = 1;
+        const intervalDuration = 50;
 
-    const isSelected = (selectedProducts: Product[], id: number) => {
-        const product = selectedProducts?.find((product) => product.id === id);
+        const interval = setInterval(() => {
+            progress += incrementStep;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+                setProgress(100);
+            }
+            setProgress(Math.round(progress));
+        }, intervalDuration);
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        clearInterval(interval);
+        console.log('clear internval');
+        router.push(`${routes.tracker}/${category}/confirmation`);
+    };
+
+    const isSelected = (
+        selectedProducts: Product[],
+        currentProduct: Product,
+    ) => {
+        const product = selectedProducts?.find(
+            (product) => product.id === currentProduct.id,
+        );
 
         if (product) {
-            return product.id === id;
+            const isChecked = product.id === currentProduct.id;
+            return isChecked;
         } else {
             return false;
         }
     };
 
+    const handleOnCheckChange = ({
+        checked,
+        products,
+        item,
+    }: {
+        checked: CheckedState;
+        products: ControllerRenderProps<
+            {
+                products: {
+                    type: string;
+                    id: number;
+                    name: string;
+                    calories: number;
+                    protein: number;
+                    carbs: number;
+                    sugar: number;
+                    fat: number;
+                    saturated_fat: number;
+                }[];
+            },
+            'products'
+        >;
+        item: Product;
+    }) => {
+        if (checked) {
+            products.onChange([...products?.value, item]);
+            onSelect({
+                productData: item,
+                isChecked: true,
+            });
+        } else {
+            onSelect({
+                productData: item,
+                isChecked: false,
+            });
+            products.onChange(
+                products?.value?.filter((value) => value.id !== item.id),
+            );
+        }
+    };
+
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                    control={form.control}
-                    name="products"
-                    render={() => (
-                        <FormItem>
-                            <div className="mb-4 flex flex-row justify-between items-center">
-                                <div>
-                                    <FormLabel className="text-base">
-                                        Products
-                                    </FormLabel>
-                                    <FormDescription>
-                                        Select the products you consumed.
-                                    </FormDescription>
+        <div>
+            {form.formState.isSubmitting && (
+                <Progress value={progress} className="h-1 my-2" />
+            )}
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-8"
+                >
+                    <FormField
+                        control={form.control}
+                        name="products"
+                        render={() => (
+                            <FormItem>
+                                <div className="mb-4 flex flex-row justify-between items-center">
+                                    <div>
+                                        <FormLabel className="text-base">
+                                            Products
+                                        </FormLabel>
+                                        <FormDescription>
+                                            Select the products you consumed.
+                                        </FormDescription>
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        disabled={form.formState.isSubmitting}
+                                    >
+                                        Save Selection
+                                    </Button>
                                 </div>
-                                <Button type="submit">Save Selection</Button>
-                            </div>
-                            <div className="flex gap-4 w-full overflow-x-scroll pb-4">
-                                {products.map((item, index) => (
-                                    <FormField
-                                        key={index}
-                                        control={form.control}
-                                        name="products"
-                                        render={({ field: products }) => {
-                                            return (
-                                                <FormItem
-                                                    key={item.id}
-                                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                                >
-                                                    <div className="flex items-center relative">
-                                                        <div className="absolute right-0 top-0 pt-3 pr-4">
-                                                            <FormControl>
+                                <div className="flex gap-4 w-full overflow-x-scroll pb-4">
+                                    {products.map((item, index) => (
+                                        <FormField
+                                            key={index}
+                                            control={form.control}
+                                            name="products"
+                                            render={({ field: products }) => {
+                                                return (
+                                                    <FormItem
+                                                        key={item.id}
+                                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                                    >
+                                                        <div className="flex items-center relative">
+                                                            <FormControl className="absolute top-0 right-0 m-4">
                                                                 <Checkbox
                                                                     checked={isSelected(
                                                                         products.value,
-                                                                        item.id,
+                                                                        item,
                                                                     )}
                                                                     onCheckedChange={(
                                                                         checked,
-                                                                    ) => {
-                                                                        return checked
-                                                                            ? products.onChange(
-                                                                                  [
-                                                                                      ...products?.value,
-                                                                                      item,
-                                                                                  ],
-                                                                              )
-                                                                            : products.onChange(
-                                                                                  products?.value?.filter(
-                                                                                      (
-                                                                                          value,
-                                                                                      ) =>
-                                                                                          value.id !==
-                                                                                          item.id,
-                                                                                  ),
-                                                                              );
-                                                                    }}
+                                                                    ) =>
+                                                                        handleOnCheckChange(
+                                                                            {
+                                                                                checked,
+                                                                                item,
+                                                                                products,
+                                                                            },
+                                                                        )
+                                                                    }
                                                                 />
                                                             </FormControl>
+                                                            <FormLabel className="text-sm font-normal cursor-pointer">
+                                                                <ProductCard
+                                                                    product={
+                                                                        item
+                                                                    }
+                                                                />
+                                                            </FormLabel>
                                                         </div>
-                                                        <FormLabel className="text-sm font-normal">
-                                                            <ProductCard
-                                                                product={item}
-                                                            />
-                                                        </FormLabel>
-                                                    </div>
-                                                </FormItem>
-                                            );
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </form>
-        </Form>
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </form>
+            </Form>
+        </div>
     );
 }

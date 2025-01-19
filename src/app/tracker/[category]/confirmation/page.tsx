@@ -10,7 +10,7 @@ export const metadata = {
 
 const Page = async () => {
     return (
-        <div className="space-y-8 max-w-4xl">
+        <div className="space-y-8 max-w-4xl flex flex-col items-center justify-center h-full mx-auto">
             <p className="uppercase font-medium">
                 Thank you for your dedication to getting fit, your hard work and
                 commitment are truly inspiring!

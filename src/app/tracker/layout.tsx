@@ -5,7 +5,7 @@ const TrackerLayout = ({
 }: Readonly<{
     children: React.ReactNode;
 }>) => {
-    return <div className="h-full container mx-auto">{children}</div>;
+    return <div className="h-full container mx-auto p-5">{children}</div>;
 };
 
 export default TrackerLayout;
