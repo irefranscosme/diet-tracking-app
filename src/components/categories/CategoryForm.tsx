@@ -31,6 +31,8 @@ import BackButton from '../navigation/BackButton';
 
 const formSchema = z.object({
     category: z.string(),
+    name: z.string(),
+    type: z.string(),
     protein: z.string().or(z.number()),
     calories: z.string().or(z.number()),
     carbs: z.string().or(z.number()),
@@ -53,6 +55,8 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
         resolver: zodResolver(formSchema),
         defaultValues: {
             category: category,
+            name: '',
+            type: '',
             calories: '0',
             carbs: '0',
             fat: '0',
@@ -88,6 +92,18 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
 
     return (
         <div className="w-full space-y-8 mx-auto">
+            <div>
+                <article>
+                    <h2 className="font-medium">Manual Method</h2>
+                    <p className="text-sm text-muted-foreground">
+                        You can use this to input your macro for{' '}
+                        <span className="lowercase">
+                            {CategoryDictionary[category]}{' '}
+                        </span>
+                        here.
+                    </p>
+                </article>
+            </div>
             <Form {...form}>
                 <div className="space-y-8">
                     <div className="max-w-2xl mx-auto">
@@ -107,6 +123,66 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                                             disabled={true}
                                             required
                                             className="mt-0 basis-full flex items-center justify-center border border-l-0 rounded-none shadow-none"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem className="space-y-0 flex">
+                                    <div className=" gap-2 basis-full border-t-0 flex items-center justify-center border">
+                                        <FormLabel>
+                                            Name
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </FormLabel>
+                                    </div>
+                                    {/* <FormDescription className="text-red-500">
+                                    {
+                                        form.getFieldState('protein').error
+                                            ?.message
+                                    }
+                                </FormDescription> */}
+                                    <FormControl className="basis-full">
+                                        <Input
+                                            placeholder="Food you consume"
+                                            {...field}
+                                            required
+                                            className="mt-0 basis-full flex items-center justify-center border border-l-0 border-t-0 rounded-none shadow-none"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="type"
+                            render={({ field }) => (
+                                <FormItem className="space-y-0 flex">
+                                    <div className=" gap-2 basis-full border-t-0 flex items-center justify-center border">
+                                        <FormLabel>
+                                            Type of Food
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </FormLabel>
+                                    </div>
+                                    {/* <FormDescription className="text-red-500">
+                                    {
+                                        form.getFieldState('protein').error
+                                            ?.message
+                                    }
+                                </FormDescription> */}
+                                    <FormControl className="basis-full">
+                                        <Input
+                                            placeholder="Type of the food you consume."
+                                            {...field}
+                                            required
+                                            className="mt-0 basis-full flex items-center justify-center border border-l-0 border-t-0 rounded-none shadow-none"
                                         />
                                     </FormControl>
                                 </FormItem>
