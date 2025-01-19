@@ -5,7 +5,7 @@ const DashboardLayout = ({
 }: Readonly<{
     children: React.ReactNode;
 }>) => {
-    return <div>{children}</div>;
+    return <div className="h-full flex container py-2 mx-auto">{children}</div>;
 };
 
 export default DashboardLayout;

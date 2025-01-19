@@ -80,11 +80,9 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
             }, intervalDuration);
 
             await new Promise((resolve) => setTimeout(resolve, 3000));
-
+            console.log(values);
             clearInterval(interval);
             router.push(`${routes.tracker}/${category}/confirmation`);
-            console.log(values);
-            console.log('interval cleared');
         });
     };
 

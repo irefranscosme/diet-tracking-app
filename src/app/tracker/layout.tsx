@@ -6,7 +6,7 @@ const TrackerLayout = ({
     children: React.ReactNode;
 }>) => {
     return (
-        <div className="h-full flex  items-center container justify-center mx-auto  ">
+        <div className="h-full flex  items-center container justify-center mx-auto">
             {children}
         </div>
     );
