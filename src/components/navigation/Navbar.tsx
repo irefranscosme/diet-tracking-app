@@ -1,15 +1,17 @@
 'use client';
 
 import { memo } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import Link from 'next/link';
 import { routes } from '@/utils/routes';
 import { useActiveLink } from '@/hooks/useActiveLink';
+import NotificationContainer from '../notification/NotificationContainer';
+import Profile from '../profile/Profile';
 
+// TODO: why this is on memo? check if there are re-rendering issues.
 const Navbar = memo(() => {
     const { isActive } = useActiveLink();
     return (
-        <nav className="flex justify-between px-4 py-2 border items-center">
+        <nav className="flex justify-between px-4 py-4 border items-center">
             <ul className="flex flex-row gap-3">
                 <li
                     className={`${
@@ -39,10 +41,10 @@ const Navbar = memo(() => {
                     <Link href={routes.meals}>Meals</Link>
                 </li>
             </ul>
-            <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+            <div className="flex gap-3 flex-row items-center justify-center">
+                <NotificationContainer />
+                <Profile />
+            </div>
         </nav>
     );
 });
