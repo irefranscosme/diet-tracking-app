@@ -17,10 +17,9 @@ import {
 import { Product } from '@/types/Product';
 import { ProductCard } from './ProductCard';
 import { CheckedState } from '@radix-ui/react-checkbox';
-import { useState } from 'react';
-import { Progress } from '../ui/progress';
 import { useRouter } from 'next/navigation';
 import { routes } from '@/utils/routes';
+import ProductProgress from './ProductProgress';
 
 const products: Product[] = [
     {
@@ -115,8 +114,6 @@ export function ProductSelection({
     category,
     onSelect,
 }: ProductSelectionProps) {
-    const [progress, setProgress] = useState(0);
-
     const router = useRouter();
 
     const form = useForm<z.infer<typeof ProductSchema>>({
@@ -129,22 +126,7 @@ export function ProductSelection({
     const onSubmit = async (data: z.infer<typeof ProductSchema>) => {
         form.clearErrors();
         console.log(data);
-        let progress = 0;
-        const incrementStep = 1;
-        const intervalDuration = 50;
-
-        const interval = setInterval(() => {
-            progress += incrementStep;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(interval);
-                setProgress(100);
-            }
-            setProgress(Math.round(progress));
-        }, intervalDuration);
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        clearInterval(interval);
-        console.log('clear internval');
         router.push(`${routes.tracker}/${category}/confirmation`);
     };
 
@@ -207,9 +189,7 @@ export function ProductSelection({
 
     return (
         <div>
-            {form.formState.isSubmitting && (
-                <Progress value={progress} className="h-1 my-2" />
-            )}
+            <ProductProgress isSubmitting={form.formState.isSubmitting} />
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
