@@ -23,11 +23,11 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from '../ui/alert-dialog';
-import { CategoryDictionary } from '@/utils/category';
 import { Progress } from '../ui/progress';
 import { useRouter } from 'next/navigation';
-import { routes } from '@/utils/routes';
 import BackButton from '../navigation/BackButton';
+import { MacroMealDictionary } from '@/utils/category';
+import { AlertDialogDescription } from '@radix-ui/react-alert-dialog';
 
 const formSchema = z.object({
     category: z.string(),
@@ -41,11 +41,14 @@ const formSchema = z.object({
     saturated_fat: z.string().or(z.number()),
 });
 
-interface CategoryFormProps {
+interface MealFormProps {
     category: string;
+    route: string;
 }
 
-export const CategoryForm = memo(({ category }: CategoryFormProps) => {
+// TODO: why this is on memo? are there any re-rendering issues?
+// TODO: separate meal form and macro form since backend table will be different
+export const MealForm = memo(({ category, route }: MealFormProps) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [progress, setProgress] = useState(0);
@@ -86,24 +89,12 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
             await new Promise((resolve) => setTimeout(resolve, 3000));
             console.log(values);
             clearInterval(interval);
-            router.push(`${routes.tracker}/${category}/confirmation`);
+            router.push(`${route}/${category}/confirmation`);
         });
     };
 
     return (
         <div className="w-full space-y-8 mx-auto">
-            <div>
-                <article>
-                    <h2 className="font-medium">Manual Method</h2>
-                    <p className="text-sm text-muted-foreground">
-                        You can use this to input your macro for{' '}
-                        <span className="lowercase">
-                            {CategoryDictionary[category]}{' '}
-                        </span>
-                        here.
-                    </p>
-                </article>
-            </div>
             <Form {...form}>
                 <div className="space-y-8">
                     <div className="max-w-2xl mx-auto">
@@ -119,7 +110,10 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                                         <Input
                                             placeholder="Your protein intake"
                                             {...field}
-                                            value={CategoryDictionary[category]}
+                                            value={
+                                                MacroMealDictionary[category] ||
+                                                MacroMealDictionary['default']
+                                            }
                                             disabled={true}
                                             required
                                             className="mt-0 basis-full flex items-center justify-center rounded-none shadow-none"
@@ -141,12 +135,6 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                                             </span>
                                         </FormLabel>
                                     </div>
-                                    {/* <FormDescription className="text-red-500">
-                                    {
-                                        form.getFieldState('protein').error
-                                            ?.message
-                                    }
-                                </FormDescription> */}
                                     <FormControl className="basis-full">
                                         <Input
                                             placeholder="Food you consume"
@@ -158,7 +146,8 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                                 </FormItem>
                             )}
                         />
-                        <FormField
+                        {/* TODO: type of food is already the category input field */}
+                        {/* <FormField
                             control={form.control}
                             name="type"
                             render={({ field }) => (
@@ -171,12 +160,6 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                                             </span>
                                         </FormLabel>
                                     </div>
-                                    {/* <FormDescription className="text-red-500">
-                                    {
-                                        form.getFieldState('protein').error
-                                            ?.message
-                                    }
-                                </FormDescription> */}
                                     <FormControl className="basis-full">
                                         <Input
                                             placeholder="Type of the food you consume."
@@ -187,7 +170,7 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                                     </FormControl>
                                 </FormItem>
                             )}
-                        />
+                        /> */}
                         <FormField
                             control={form.control}
                             name="protein"
@@ -201,12 +184,6 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                                             </span>
                                         </FormLabel>
                                     </div>
-                                    {/* <FormDescription className="text-red-500">
-                                    {
-                                        form.getFieldState('protein').error
-                                            ?.message
-                                    }
-                                </FormDescription> */}
                                     <FormControl className="basis-full">
                                         <Input
                                             placeholder="Your protein intake"
@@ -387,13 +364,15 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
                         <AlertDialogTitle>
                             Are you absolutely sure?
                         </AlertDialogTitle>
-                        <p>You are about to save the following:</p>
+                        <AlertDialogDescription>
+                            You are about to save the following:
+                        </AlertDialogDescription>
                         <ul className="mt-2">
                             <li>
                                 Category:{' '}
                                 <span className="font-semibold">
                                     {
-                                        CategoryDictionary[
+                                        MacroMealDictionary[
                                             form.getValues('category')
                                         ]
                                     }
@@ -460,4 +439,4 @@ export const CategoryForm = memo(({ category }: CategoryFormProps) => {
     );
 });
 
-CategoryForm.displayName = 'Category Form';
+MealForm.displayName = 'Meal Form';

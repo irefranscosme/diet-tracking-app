@@ -1,3 +1,4 @@
+// TODO: For removal
 enum MealCategory {
     PROTEINS = 'Proteins',
     CARBOHYDRATES = 'Carbohydrates',
@@ -11,6 +12,7 @@ export const MealCategoryDictionary: Record<string, string> = {
     vegetables: MealCategory.VEGETABLES,
     fats: MealCategory.HEALTHY_FATS,
     dairy: MealCategory.DAIRY,
+    default: 'No selected category',
 };
 
 export const categories = [

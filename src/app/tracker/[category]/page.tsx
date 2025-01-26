@@ -1,7 +1,8 @@
-import { CategoryForm } from '@/components/categories/CategoryForm';
+import { MealForm } from '@/components/forms/MealForm';
 import Products from '@/components/products/Products';
 import { SearchBar } from '@/components/search/SearchBar';
-import { CategoryDictionary } from '@/utils/category';
+import { MacroMealDictionary } from '@/utils/category';
+import { routes } from '@/utils/routes';
 import { Suspense } from 'react';
 
 // TODO: improve metadata
@@ -16,7 +17,7 @@ const Page = async ({ params }: { params: Promise<{ category: string }> }) => {
         <div className="w-full px-4 h-full space-y-4">
             <div className="space-y-2">
                 <h1 className="uppercase font-bold text-lg">
-                    {CategoryDictionary[category]}
+                    {MacroMealDictionary[category]}
                 </h1>
                 <SearchBar placeholder="Search products..." />
             </div>
@@ -32,7 +33,7 @@ const Page = async ({ params }: { params: Promise<{ category: string }> }) => {
                         <Products category={category} />
                     </Suspense>
                 </div>
-                <CategoryForm category={category} />
+                <MealForm category={category} route={routes.tracker} />
             </div>
         </div>
     );
