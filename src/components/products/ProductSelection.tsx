@@ -20,6 +20,14 @@ import { CheckedState } from '@radix-ui/react-checkbox';
 import { useRouter } from 'next/navigation';
 import { routes } from '@/utils/routes';
 import Progress from '../progress/Progress';
+import { Save, ScanLine } from 'lucide-react';
+import AddMealDialog from '../meals/AddMealDialog';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '../ui/tooltip';
 
 const products: Product[] = [
     {
@@ -209,12 +217,45 @@ export function ProductSelection({
                                             Select the products you consumed.
                                         </FormDescription>
                                     </div>
-                                    <Button
-                                        type="submit"
-                                        disabled={form.formState.isSubmitting}
-                                    >
-                                        Save Selection
-                                    </Button>
+                                    <div className="flex flex-row gap-2 items-center">
+                                        <Button
+                                            type="submit"
+                                            disabled={
+                                                form.formState.isSubmitting
+                                            }
+                                        >
+                                            <div className="flex flex-row gap-2 items-center">
+                                                <Save />
+                                                <p> Save Selection</p>
+                                            </div>
+                                        </Button>
+                                        {/* TODO: Pro Feature: AI Calorie Calculator Scanner for Meal using Open AI or Gemini */}
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <Button
+                                                        type="button"
+                                                        disabled={true}
+                                                    >
+                                                        <div className="flex flex-row gap-2 items-center">
+                                                            <ScanLine />
+                                                            <p>Scan</p>
+                                                        </div>
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>
+                                                        AI Calorie Calculator
+                                                        Scanner Soon
+                                                    </p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <AddMealDialog
+                                            category={category}
+                                            isManual={true}
+                                        />
+                                    </div>
                                 </div>
                                 <div className="flex gap-4 w-full overflow-x-scroll pb-4">
                                     {products.map((item, index) => (

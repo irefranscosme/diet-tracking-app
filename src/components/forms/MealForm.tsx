@@ -24,7 +24,6 @@ import {
     AlertDialogAction,
 } from '../ui/alert-dialog';
 import { useRouter } from 'next/navigation';
-import BackButton from '../navigation/BackButton';
 import { MacroMealDictionary } from '@/utils/category';
 import { AlertDialogDescription } from '@radix-ui/react-alert-dialog';
 import Progress from '../progress/Progress';
@@ -324,11 +323,7 @@ export const MealForm = memo(({ category, route }: MealFormProps) => {
                             )}
                         />
                     </div>
-                    <div className="flex justify-between">
-                        {/* <Link to>
-                            <Button variant="outline">Back</Button>
-                        </Link> */}
-                        <BackButton />
+                    <div className="flex justify-end">
                         <Button
                             onClick={() => setOpenDialog(true)}
                             className="float-right"

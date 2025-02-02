@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '../ui/dialog';
-import { Plus } from 'lucide-react';
+import { Plus, TextCursorInput } from 'lucide-react';
 import { Button } from '../ui/button';
 import { MealForm } from '../forms/MealForm';
 import { MacroMealDictionary } from '@/utils/category';
@@ -16,9 +16,10 @@ import { routes } from '@/utils/routes';
 
 interface AddMealDialogProps {
     category: string;
+    isManual?: boolean;
 }
 
-const AddMealDialog = ({ category }: AddMealDialogProps) => {
+const AddMealDialog = ({ category, isManual }: AddMealDialogProps) => {
     const [open, setOpen] = useState<boolean>(false);
     const handleDialog = () => {
         if (open) {
@@ -30,13 +31,24 @@ const AddMealDialog = ({ category }: AddMealDialogProps) => {
 
     return (
         <>
-            {category && (
+            {!isManual && category && (
+                <Button onClick={handleDialog} type="button">
+                    <div className="flex flex-row gap-2 items-center">
+                        <Plus />
+                        <p>Add Meal</p>
+                    </div>
+                </Button>
+            )}
+            {category && isManual && (
                 <Button
-                    className="flex gap-2 items-center justify-center"
                     onClick={handleDialog}
+                    type="button"
+                    className="flex flex-row gap-2 items-center"
                 >
-                    <Plus />
-                    <p>Add Meal</p>
+                    <div className="flex flex-row gap-2 items-center">
+                        <TextCursorInput />
+                        <p>Manual</p>
+                    </div>
                 </Button>
             )}
             <Dialog open={open} onOpenChange={handleDialog} modal={true}>

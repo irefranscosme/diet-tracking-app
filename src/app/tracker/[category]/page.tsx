@@ -1,8 +1,6 @@
-import { MealForm } from '@/components/forms/MealForm';
 import Products from '@/components/products/Products';
 import { SearchBar } from '@/components/search/SearchBar';
 import { MacroMealDictionary } from '@/utils/category';
-import { routes } from '@/utils/routes';
 import { Suspense } from 'react';
 
 // TODO: improve metadata
@@ -33,7 +31,6 @@ const Page = async ({ params }: { params: Promise<{ category: string }> }) => {
                         <Products category={category} />
                     </Suspense>
                 </div>
-                <MealForm category={category} route={routes.tracker} />
             </div>
         </div>
     );

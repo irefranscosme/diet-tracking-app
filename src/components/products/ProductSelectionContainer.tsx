@@ -47,6 +47,7 @@ export const ProductSelectionContainer = ({
                 </article>
                 {/* TODO: Total Macros */}
             </div>
+            {/* <MealForm category={category} route={routes.tracker} /> */}
         </div>
     );
 };
