@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/navigation/Navbar';
+import NotificationContainer from '@/components/notification/NotificationContainer';
+import Profile from '@/components/profile/Profile';
+import { Suspense } from 'react';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -35,7 +38,13 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased font-[family-name:var(--font-geist-sans)]`}
             >
                 <div className="grid grid-rows-[auto,1fr] h-screen">
-                    <Navbar />
+                    <Navbar>
+                        <NotificationContainer />
+                        {/* TODO: Profile skeleton */}
+                        <Suspense fallback={<div>Profile loading...</div>}>
+                            <Profile />
+                        </Suspense>
+                    </Navbar>
                     {children}
                 </div>
             </body>

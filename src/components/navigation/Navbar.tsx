@@ -1,14 +1,12 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, ReactNode } from 'react';
 import Link from 'next/link';
 import { routes } from '@/utils/routes';
 import { useActiveLink } from '@/hooks/useActiveLink';
-import NotificationContainer from '../notification/NotificationContainer';
-import Profile from '../profile/Profile';
 
 // TODO: why this is on memo? check if there are re-rendering issues.
-const Navbar = memo(() => {
+const Navbar = memo(({ children }: { children: ReactNode }) => {
     const { isActive } = useActiveLink();
     return (
         <nav className="flex justify-between px-4 py-4 border items-center">
@@ -42,8 +40,7 @@ const Navbar = memo(() => {
                 </li>
             </ul>
             <div className="flex gap-3 flex-row items-center justify-center">
-                <NotificationContainer />
-                <Profile />
+                {children}
             </div>
         </nav>
     );

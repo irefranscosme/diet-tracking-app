@@ -5,6 +5,7 @@ import { CarbsChart } from '@/components/charts/CarbsChart';
 import { LastMonthChart } from '@/components/charts/LastMonthChart';
 import { MacrosChart } from '@/components/charts/MacrosChart';
 import { ExtraMacrosChart } from '@/components/charts/ExtraMacrosChart';
+import { createSupabaseServer } from '@/utils/supabase/server';
 
 // TODO: improve metadata
 export const metadata = {
@@ -12,13 +13,17 @@ export const metadata = {
     description: 'Dashboard - Diet Tracking App Descripition',
 };
 
-export default function Page() {
+export default async function Page() {
+    const supabase = await createSupabaseServer();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
     return (
         <main className="container mx-auto py-5 px-5">
             <div className="flex flex-col gap-5">
                 <div className="space-y-4 basis-9">
                     <h1 className="font-bold text-lg">
-                        Welcome Back, John Doe!
+                        Welcome Back, {user?.user_metadata.name || 'User'}
                     </h1>
                     <div className="flex flex-col">
                         <p>

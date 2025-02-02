@@ -414,4 +414,4 @@ export const MealForm = memo(({ category, route }: MealFormProps) => {
     );
 });
 
-MealForm.displayName = 'Meal Form';
+MealForm.displayName = 'MealForm';
