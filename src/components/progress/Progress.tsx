@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Progress } from '../ui/progress';
+import { Progress as ShadProgress } from '../ui/progress';
 
-interface ProductProgressProps {
+interface ProgressProps {
     isSubmitting: boolean;
+    className?: string;
 }
 
-const ProductProgress = ({ isSubmitting }: ProductProgressProps) => {
+const Progress = ({ isSubmitting, className }: ProgressProps) => {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
@@ -27,16 +28,20 @@ const ProductProgress = ({ isSubmitting }: ProductProgressProps) => {
 
         return () => {
             clearInterval(interval);
-            console.log('clear internval');
         };
     }, [isSubmitting]);
 
     return (
         <div>
-            {isSubmitting && <Progress value={progress} className="h-1 my-2" />}
+            {isSubmitting && (
+                <ShadProgress
+                    value={progress}
+                    className={`h-1 my-2 ${className}`}
+                />
+            )}
         </div>
     );
 };
-ProductProgress.displayName = 'ProductProgress';
+Progress.displayName = 'Progress';
 
-export default ProductProgress;
+export default Progress;

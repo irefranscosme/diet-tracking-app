@@ -19,7 +19,7 @@ import { ProductCard } from './ProductCard';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { useRouter } from 'next/navigation';
 import { routes } from '@/utils/routes';
-import ProductProgress from './ProductProgress';
+import Progress from '../progress/Progress';
 
 const products: Product[] = [
     {
@@ -189,7 +189,7 @@ export function ProductSelection({
 
     return (
         <div>
-            <ProductProgress isSubmitting={form.formState.isSubmitting} />
+            <Progress isSubmitting={form.formState.isSubmitting} />
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}

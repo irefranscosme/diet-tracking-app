@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useTransition } from 'react';
+import React, { memo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
     Form,
@@ -23,11 +23,11 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from '../ui/alert-dialog';
-import { Progress } from '../ui/progress';
 import { useRouter } from 'next/navigation';
 import BackButton from '../navigation/BackButton';
 import { MacroMealDictionary } from '@/utils/category';
 import { AlertDialogDescription } from '@radix-ui/react-alert-dialog';
+import Progress from '../progress/Progress';
 
 const formSchema = z.object({
     category: z.string(),
@@ -50,8 +50,7 @@ interface MealFormProps {
 // TODO: separate meal form and macro form since backend table will be different
 export const MealForm = memo(({ category, route }: MealFormProps) => {
     const [openDialog, setOpenDialog] = useState(false);
-    const [isPending, startTransition] = useTransition();
-    const [progress, setProgress] = useState(0);
+    // const [progress, setProgress] = useState(0);
     const router = useRouter();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -69,28 +68,11 @@ export const MealForm = memo(({ category, route }: MealFormProps) => {
         },
     });
 
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-        startTransition(async () => {
-            form.clearErrors();
-            let progress = 0;
-            const incrementStep = 1;
-            const intervalDuration = 50;
-
-            const interval = setInterval(() => {
-                progress += incrementStep;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    setProgress(100);
-                }
-                setProgress(Math.round(progress));
-            }, intervalDuration);
-
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-            console.log(values);
-            clearInterval(interval);
-            router.push(`${route}/${category}/confirmation`);
-        });
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        form.clearErrors();
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        console.log(values);
+        router.push(`${route}/${category}/confirmation`);
     };
 
     return (
@@ -360,6 +342,10 @@ export const MealForm = memo(({ category, route }: MealFormProps) => {
 
             <AlertDialog open={openDialog}>
                 <AlertDialogContent>
+                    <Progress
+                        isSubmitting={form.formState.isSubmitting}
+                        className="rounded-none"
+                    />
                     <AlertDialogHeader>
                         <AlertDialogTitle>
                             Are you absolutely sure?
@@ -422,17 +408,11 @@ export const MealForm = memo(({ category, route }: MealFormProps) => {
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => form.handleSubmit(onSubmit)()}
-                            disabled={isPending}
+                            disabled={form.formState.isSubmitting}
                         >
                             Continue
                         </AlertDialogAction>
                     </AlertDialogFooter>
-                    {isPending && (
-                        <Progress
-                            value={progress}
-                            className="absolute rounded-none h-1"
-                        />
-                    )}
                 </AlertDialogContent>
             </AlertDialog>
         </div>
