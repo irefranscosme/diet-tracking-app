@@ -232,12 +232,12 @@ export function ProductSelection({
                                         {/* TODO: Pro Feature: AI Calorie Calculator Scanner for Meal using Open AI or Gemini */}
                                         <TooltipProvider>
                                             <Tooltip>
-                                                <TooltipTrigger>
-                                                    <Button
-                                                        type="button"
-                                                        disabled={true}
-                                                    >
-                                                        <div className="flex flex-row gap-2 items-center">
+                                                <TooltipTrigger
+                                                    className="opacity-50"
+                                                    asChild
+                                                >
+                                                    <Button type="button">
+                                                        <div className="flex flex-row gap-2 items-center pointer-events-none">
                                                             <ScanLine />
                                                             <p>Scan</p>
                                                         </div>
