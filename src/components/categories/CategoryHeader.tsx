@@ -1,4 +1,5 @@
 import Scanner from '../scanner/Scanner';
+import Uploader from '../scanner/Uploader';
 
 const CategoryHeader = () => {
     return (
@@ -7,8 +8,9 @@ const CategoryHeader = () => {
                 Calories for the day:{' '}
                 <span className="font-bold">1,200 kcal</span>
             </h1>
-            <div>
+            <div className="flex flex-row gap-2 items-center">
                 <Scanner />
+                <Uploader />
             </div>
         </div>
     );

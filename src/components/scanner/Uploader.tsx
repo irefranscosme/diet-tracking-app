@@ -1,8 +1,8 @@
 'use client';
 
-import { useReducer, useRef, useState } from 'react';
+import { useReducer, useState } from 'react';
 import { Button } from '../ui/button';
-import { ScanLine } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -11,6 +11,19 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '../ui/dialog';
+import { Input } from '../ui/input';
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+} from '../ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import Image from 'next/image';
+import { Spinner } from '../ui/spinner';
 
 type Macro = {
     calories: string | number | null;
@@ -56,142 +69,26 @@ const reducer = (state: State, action: Action): State => {
             return state;
     }
 };
+const ACCEPTED_IMAGE_TYPES: string[] = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+];
 
-const Scanner = () => {
-    const [isCaptured, setIsCaptured] = useState<boolean>(false);
-    const [hasCameraError, setHasCameraError] = useState<boolean>(false);
+const FormSchema = z.object({
+    imageUrl: z
+        .instanceof(File)
+        .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
+            message: 'Only these types are allowed .jpg, .jpeg, .png and .webp',
+        })
+        .optional(),
+});
+
+const Uploader = () => {
     const [imageUrl, setImageUrl] = useState<string>('');
-    const videoPlayerRef = useRef<HTMLVideoElement | null>(null);
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [state, dispatch] = useReducer(reducer, initialState);
 
-    const initializeMedia = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: {
-                        min: 1280,
-                        ideal: 1920,
-                        max: 2560,
-                    },
-                    height: {
-                        min: 720,
-                        ideal: 1080,
-                        max: 1440,
-                    },
-                    facingMode: 'environment',
-                },
-                audio: false,
-            });
-            if (videoPlayerRef.current) {
-                videoPlayerRef.current.srcObject = stream;
-                console.log('🚀 ~ initializeMedia ~ stream:', stream);
-            } else {
-                throw new Error('Failed to get video stream');
-            }
-        } catch (e) {
-            console.error('Error accessing camera:', e);
-            setHasCameraError(true);
-        }
-    };
-
-    const handleSaveImage = async (): Promise<string | undefined> => {
-        setIsCaptured(true);
-        const canvas = canvasRef.current;
-        const context = canvas?.getContext('2d');
-
-        if (canvas && context && videoPlayerRef.current) {
-            context.imageSmoothingEnabled = true;
-            context.imageSmoothingQuality = 'high';
-            canvas.width = videoPlayerRef?.current.videoWidth;
-            canvas.height = videoPlayerRef?.current.videoHeight;
-        }
-
-        if (videoPlayerRef.current) {
-            const videoPlayer = videoPlayerRef.current;
-
-            context?.drawImage(
-                videoPlayerRef.current,
-                0,
-                0,
-                canvas?.width || 0,
-                canvas?.height || 0,
-            );
-
-            const imageDataUrl = canvas?.toDataURL('image/png');
-
-            if (imageDataUrl) {
-                setImageUrl(imageDataUrl);
-                setIsCaptured(false);
-                console.log(imageDataUrl);
-
-                (videoPlayer.srcObject as MediaStream)
-                    .getVideoTracks()
-                    .map((track) => track.stop());
-
-                return imageDataUrl;
-            }
-        }
-    };
-
-    const handleCapture = async () => {
-        try {
-            const imageUrl = await handleSaveImage();
-
-            if (imageUrl) {
-                const formData = new FormData();
-                formData.append('imageUrl', imageUrl);
-                const response = await fetch('/api/tracker', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                // Handle response if necessary
-                const data = await response.json();
-
-                const text = data.message.content;
-
-                const jsonPart = text.match(/```json\s([\s\S]*?)```/);
-
-                // Parse the JSON part into an object if it exists
-                let jsonObject: Macro | null = null;
-
-                if (jsonPart) {
-                    if (jsonPart && jsonPart[1]) {
-                        try {
-                            jsonObject = JSON.parse(jsonPart[1]);
-                        } catch (e) {
-                            console.error('Error parsing JSON:', e);
-                        }
-                    }
-                } else {
-                    // If no JSON block is found, return the whole text
-                    jsonObject = JSON.parse(text);
-                }
-
-                dispatch({
-                    type: 'SET_RESPONSE',
-                    payload: {
-                        explanation: jsonObject?.explanation || '',
-                        macro: jsonObject,
-                    },
-                });
-            } else {
-                throw new Error('Failed to save image');
-            }
-        } catch (e) {
-            console.error('Error saving image', e);
-        }
-    };
-
-    const handleClearImage = async () => {
-        await initializeMedia();
-        setImageUrl('');
-        dispatch({
-            type: 'SET_RESPONSE',
-            payload: initialState,
-        });
-    };
     const [dialog, setDialog] = useState<boolean>(false);
 
     const handleClose = () => {
@@ -205,14 +102,84 @@ const Scanner = () => {
 
     const handleOpen = async () => {
         setDialog(true);
-        try {
-            await initializeMedia();
-        } catch (e) {
-            console.error('Error initializing camera', e);
-            if (videoPlayerRef.current && videoPlayerRef.current.srcObject) {
-                const stream = videoPlayerRef.current.srcObject as MediaStream;
-                const tracks = stream.getTracks();
-                tracks.forEach((track) => track.stop()); // Stop the media tracks
+        dispatch({
+            type: 'SET_RESPONSE',
+            payload: initialState,
+        });
+    };
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            imageUrl: undefined,
+        },
+    });
+
+    const convertToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+                if (reader.result) {
+                    resolve(reader.result as string); // Resolves with the Base64 string
+                }
+            };
+
+            reader.onerror = (error) => reject(error); // Rejects on error
+
+            reader.readAsDataURL(file); // Convert file to Base64 string
+        });
+    };
+
+    const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+        console.log(data);
+        if (data.imageUrl) {
+            try {
+                const imageUrl = await convertToBase64(data.imageUrl);
+
+                if (imageUrl) {
+                    const formData = new FormData();
+                    formData.append('imageUrl', imageUrl);
+                    const response = await fetch('/api/tracker', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    // Handle response if necessary
+                    const data = await response.json();
+
+                    const text = data.message.content;
+
+                    const jsonPart = text.match(/```json\s([\s\S]*?)```/);
+
+                    // Parse the JSON part into an object if it exists
+                    let jsonObject: Macro | null = null;
+
+                    if (jsonPart) {
+                        if (jsonPart && jsonPart[1]) {
+                            try {
+                                jsonObject = JSON.parse(jsonPart[1]);
+                            } catch (e) {
+                                console.error('Error parsing JSON:', e);
+                            }
+                        }
+                    } else {
+                        // If no JSON block is found, return the whole text
+                        jsonObject = JSON.parse(text);
+                    }
+
+                    dispatch({
+                        type: 'SET_RESPONSE',
+                        payload: {
+                            explanation: jsonObject?.explanation || '',
+                            macro: jsonObject,
+                        },
+                    });
+                } else {
+                    throw new Error('Failed to save image');
+                }
+            } catch (e) {
+                console.error('Error saving image', e);
             }
         }
     };
@@ -226,8 +193,8 @@ const Scanner = () => {
                 <DialogTrigger asChild>
                     <Button type="button" onClick={() => handleOpen()}>
                         <div className="flex flex-row gap-2 items-center pointer-events-none">
-                            <ScanLine />
-                            <p>Scan</p>
+                            <Upload />
+                            <p>Upload</p>
                         </div>
                     </Button>
                 </DialogTrigger>
@@ -240,33 +207,19 @@ const Scanner = () => {
                         </DialogDescription>
                     </DialogHeader>
                     <div className="flex flex-col gap-2">
-                        {hasCameraError ? (
-                            <p>
-                                Error accessing the camera. Please check your
-                                permissions.
-                            </p>
-                        ) : (
-                            <video
-                                ref={videoPlayerRef}
-                                autoPlay
-                                playsInline
-                                className={`w-full h-auto rounded-md ${
-                                    imageUrl && 'hidden'
-                                } `}
-                            />
-                        )}
-
                         <div className="relative flex flex-col gap-2">
-                            {isCaptured && (
-                                <div className="absolute inset-0 bg-white  opacity-50 animate-bounce" />
-                            )}
-                            <canvas
-                                id="canvas"
-                                ref={canvasRef}
-                                className={`w-full h-full rounded-md border  ${
-                                    imageUrl ? 'border-black' : 'hidden'
-                                }`}
-                            />
+                            <div>
+                                {imageUrl && (
+                                    <Image
+                                        src={imageUrl}
+                                        width={1920}
+                                        height={1080}
+                                        alt="Image"
+                                        layout="responsive"
+                                        className="w-full h-full rounded-md border"
+                                    />
+                                )}
+                            </div>
                             <div className="max-h-80 overflow-y-auto">
                                 <article className="flex flex-col gap-2">
                                     {state.explanation && (
@@ -359,7 +312,7 @@ const Scanner = () => {
                                                 <span className="font-semibold">
                                                     {state.macro?.ingredients.join(
                                                         ', ',
-                                                    ) || 0}
+                                                    ) || 'N/A'}
                                                 </span>
                                             </li>
                                         </ul>
@@ -367,15 +320,78 @@ const Scanner = () => {
                                 </article>
                             </div>
                         </div>
-                        <Button
-                            id="capture"
-                            variant={imageUrl ? 'outline' : 'default'}
-                            onClick={
-                                imageUrl ? handleClearImage : handleCapture
-                            }
-                        >
-                            {imageUrl ? 'Clear Image' : 'Track'}
-                        </Button>
+
+                        <Form {...form}>
+                            <form
+                                onSubmit={form.handleSubmit(onSubmit)}
+                                className="space-y-2"
+                            >
+                                <div className="">
+                                    <FormField
+                                        control={form.control}
+                                        name="imageUrl"
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-0 flex">
+                                                <FormDescription className="text-red-500">
+                                                    {
+                                                        form.getFieldState(
+                                                            'imageUrl',
+                                                        ).error?.message
+                                                    }
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="file"
+                                                        onChange={async (e) => {
+                                                            const file = e
+                                                                .target.files
+                                                                ? e.target
+                                                                      .files[0]
+                                                                : null;
+                                                            field.onChange(
+                                                                file,
+                                                            );
+
+                                                            if (file) {
+                                                                const image =
+                                                                    await convertToBase64(
+                                                                        file,
+                                                                    );
+
+                                                                setImageUrl(
+                                                                    image,
+                                                                );
+                                                                dispatch({
+                                                                    type: 'SET_RESPONSE',
+                                                                    payload:
+                                                                        initialState,
+                                                                });
+                                                            }
+                                                        }}
+                                                        className="cursor-pointer"
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="flex flex-col justify-end gap-2">
+                                    <Button
+                                        className="float-right basis-full"
+                                        type="submit"
+                                        disabled={imageUrl ? false : true}
+                                    >
+                                        Upload
+                                        {form.formState.isSubmitting && (
+                                            <Spinner
+                                                size="small"
+                                                className="text-white"
+                                            />
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -383,4 +399,4 @@ const Scanner = () => {
     );
 };
 
-export default Scanner;
+export default Uploader;
